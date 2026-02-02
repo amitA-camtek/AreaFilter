@@ -60,4 +60,21 @@ namespace AreaFilter.Converters
             throw new NotImplementedException();
         }
     }
+
+    public class HighSpecLabelVisibilityConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Length == 2 && values[0] is bool isHighVisible && values[1] is bool isLowVisible)
+            {
+                return isHighVisible ? Visibility.Visible : Visibility.Collapsed;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

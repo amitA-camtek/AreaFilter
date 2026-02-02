@@ -12,7 +12,7 @@ namespace AreaFilter.Controls
 
         public static readonly DependencyProperty MinimumProperty =
             DependencyProperty.Register("Minimum", typeof(double), typeof(NumericUpDown),
-                new PropertyMetadata(0.1));
+                new PropertyMetadata(1.0));
 
         public static readonly DependencyProperty IncrementProperty =
             DependencyProperty.Register("Increment", typeof(double), typeof(NumericUpDown),
@@ -56,8 +56,8 @@ namespace AreaFilter.Controls
 
         private void UpdateTextBox()
         {
-            ValueTextBox.TextChanged -= ValueTextBox_TextChanged;
-            ValueTextBox.Text = Value.ToString("F2");
+            ValueTextBox.TextChanged -= ValueTextBox_TextChanged;   
+            ValueTextBox.Text = Value.ToString("F0");
             ValueTextBox.TextChanged += ValueTextBox_TextChanged;
         }
 

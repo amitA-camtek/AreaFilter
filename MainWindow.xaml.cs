@@ -20,6 +20,7 @@ namespace AreaFilter
     public partial class MainWindow : Window
     {
         private int _draggedIndex = -1;
+        private bool _isDragging = false;
 
         public MainWindow()
         {
@@ -32,9 +33,25 @@ namespace AreaFilter
             var row = FindAncestor<DataGridRow>((DependencyObject)e.OriginalSource);
             if (row != null)
             {
+                var button = FindAncestor<Button>((DependencyObject)e.OriginalSource);
+                if (button != null) return;
+
                 _draggedIndex = row.GetIndex();
                 if (_draggedIndex >= 0)
                 {
+                    _isDragging = true;
+                }
+            }
+        }
+
+        private void DataGrid_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isDragging && e.LeftButton == MouseButtonState.Pressed && _draggedIndex >= 0)
+            {
+                var row = CriteriaDataGrid.ItemContainerGenerator.ContainerFromIndex(_draggedIndex) as DataGridRow;
+                if (row != null)
+                {
+                    _isDragging = false;
                     DragDrop.DoDragDrop(row, row.DataContext, DragDropEffects.Move);
                 }
             }
@@ -44,17 +61,35 @@ namespace AreaFilter
         {
             if (_draggedIndex < 0) return;
 
-            var target = FindAncestor<DataGridRow>((DependencyObject)e.OriginalSource);
-            if (target != null)
+            var targetRow = FindAncestor<DataGridRow>((DependencyObject)e.OriginalSource);
+            int targetIndex = -1;
+
+            if (targetRow != null)
             {
-                int targetIndex = target.GetIndex();
-                if (targetIndex >= 0 && targetIndex != _draggedIndex)
+                targetIndex = targetRow.GetIndex();
+            }
+            else
+            {
+                var pos = e.GetPosition(CriteriaDataGrid);
+                var hitTestResult = VisualTreeHelper.HitTest(CriteriaDataGrid, pos);
+                if (hitTestResult != null)
                 {
-                    var viewModel = DataContext as MainViewModel;
-                    viewModel?.MoveItem(_draggedIndex, targetIndex);
+                    targetRow = FindAncestor<DataGridRow>(hitTestResult.VisualHit);
+                    if (targetRow != null)
+                    {
+                        targetIndex = targetRow.GetIndex();
+                    }
                 }
             }
+
+            if (targetIndex >= 0 && targetIndex != _draggedIndex)
+            {
+                var viewModel = DataContext as MainViewModel;
+                viewModel?.MoveItem(_draggedIndex, targetIndex);
+            }
+
             _draggedIndex = -1;
+            _isDragging = false;
         }
 
         private void DataGridRow_MouseEnter(object sender, MouseEventArgs e)
@@ -70,6 +105,15 @@ namespace AreaFilter
             if (sender is DataGridRow row && row.DataContext is CriteriaItem item)
             {
                 item.IsHovered = false;
+            }
+        }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is CriteriaItem item)
+            {
+                var viewModel = DataContext as MainViewModel;
+                viewModel?.DeleteCommand.Execute(item);
             }
         }
 

@@ -5,34 +5,96 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="30" d:DesignWidth="100">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="20"/>
-        </Grid.ColumnDefinitions>
-        
-        <TextBox x:Name="ValueTextBox" 
-                 Grid.Column="0" 
-                 VerticalContentAlignment="Center"
-                 Padding="5,0"/>
-        
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+    <Border BorderBrush="#ABADB3" BorderThickness="1" Background="White">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="18"/>
+            </Grid.ColumnDefinitions>
             
-            <Button x:Name="UpButton" 
-                    Grid.Row="0" 
-                    Content="▲" 
-                    FontSize="8"
-                    Padding="0"/>
+            <TextBox x:Name="ValueTextBox" 
+                     Grid.Column="0" 
+                     BorderThickness="0"
+                     VerticalContentAlignment="Center"
+                     Padding="5,0"
+                     Background="Transparent"/>
             
-            <Button x:Name="DownButton" 
-                    Grid.Row="1" 
-                    Content="▼" 
-                    FontSize="8"
-                    Padding="0"/>
+            <Grid Grid.Column="1" Background="#F0F0F0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <Button x:Name="UpButton" 
+                        Grid.Row="0" 
+                        Content="▲" 
+                        FontSize="6"
+                        Padding="0"
+                        Margin="0"
+                        BorderThickness="0,0,0,0.5"
+                        BorderBrush="#ABADB3">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}">
+                                            <ContentPresenter HorizontalAlignment="Center" 
+                                                            VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#E5E5E5"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter Property="Background" Value="#CCCCCC"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                
+                <Button x:Name="DownButton" 
+                        Grid.Row="1" 
+                        Content="▼" 
+                        FontSize="6"
+                        Padding="0"
+                        Margin="0"
+                        BorderThickness="0"
+                        BorderBrush="#ABADB3">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}">
+                                            <ContentPresenter HorizontalAlignment="Center" 
+                                                            VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#E5E5E5"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter Property="Background" Value="#CCCCCC"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
         </Grid>
-    </Grid>
+    </Border>
 </UserControl>
