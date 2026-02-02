@@ -4,9 +4,159 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AreaFilter"
+        xmlns:controls="clr-namespace:AreaFilter.Controls"
+        xmlns:converters="clr-namespace:AreaFilter.Converters"
         mc:Ignorable="d"
-        Title="AreaFilter" Height="450" Width="800">
-    <Grid>
+        Title="Area Filter - Criteria Manager" Height="600" Width="900">
+    
+    <Window.Resources>
+        <converters:RuleToLowSpecVisibilityConverter x:Key="RuleToLowSpecVisibilityConverter"/>
+        <converters:RuleToHighSpecVisibilityConverter x:Key="RuleToHighSpecVisibilityConverter"/>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         
+        <Style TargetType="ComboBox">
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Height" Value="30"/>
+        </Style>
+        
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="15,5"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        
+        <Style TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Input Section -->
+        <GroupBox Grid.Row="0" Header="Add New Criteria" Padding="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="120"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Criteria -->
+                <Label Grid.Row="0" Grid.Column="0" Content="Criteria:"/>
+                <ComboBox Grid.Row="0" Grid.Column="1" 
+                          ItemsSource="{Binding CriteriaTypes}"
+                          SelectedItem="{Binding SelectedCriteria}"/>
+                
+                <!-- Rule -->
+                <Label Grid.Row="0" Grid.Column="2" Content="Rule:"/>
+                <ComboBox Grid.Row="0" Grid.Column="3" 
+                          ItemsSource="{Binding RuleTypes}"
+                          SelectedItem="{Binding SelectedRule}"/>
+                
+                <!-- Low Spec -->
+                <Label Grid.Row="0" Grid.Column="4" Content="Low Spec:"
+                       Visibility="{Binding IsLowSpecVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <controls:NumericUpDown Grid.Row="0" Grid.Column="5" 
+                                        Value="{Binding LowSpec, Mode=TwoWay}"
+                                        Minimum="0.1"
+                                        Visibility="{Binding IsLowSpecVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                
+                <!-- High Spec -->
+                <Label Grid.Row="0" Grid.Column="6" Content="High Spec:"
+                       Visibility="{Binding IsHighSpecVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <controls:NumericUpDown Grid.Row="0" Grid.Column="7" 
+                                        Value="{Binding HighSpec, Mode=TwoWay}"
+                                        Minimum="0.1"
+                                        Visibility="{Binding IsHighSpecVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </Grid>
+        </GroupBox>
+        
+        <!-- Add Button -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,5">
+            <Button Content="Add New" Command="{Binding AddNewCommand}" Width="100"/>
+        </StackPanel>
+        
+        <!-- DataGrid Section -->
+        <GroupBox Grid.Row="2" Header="Criteria List" Padding="10" Margin="0,10,0,0">
+            <DataGrid x:Name="CriteriaDataGrid"
+                      ItemsSource="{Binding CriteriaItems}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      SelectionMode="Single"
+                      GridLinesVisibility="All"
+                      HeadersVisibility="Column"
+                      AllowDrop="True"
+                      PreviewMouseLeftButtonDown="DataGrid_PreviewMouseLeftButtonDown"
+                      Drop="DataGrid_Drop">
+                
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Order" Binding="{Binding Order}" Width="60" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Criteria" Binding="{Binding Criteria}" Width="*" IsReadOnly="True"/>
+                    
+                    <DataGridTextColumn Header="Rule" Binding="{Binding Rule}" Width="*" IsReadOnly="True"/>
+                    
+                    <DataGridTextColumn Header="Low Spec" Binding="{Binding LowSpec, StringFormat=F2}" Width="*" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="{Binding Rule, Converter={StaticResource RuleToLowSpecVisibilityConverter}}"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="High Spec" Binding="{Binding HighSpec, StringFormat=F2}" Width="*" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="{Binding Rule, Converter={StaticResource RuleToHighSpecVisibilityConverter}}"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTemplateColumn Header="" Width="60">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Delete" 
+                                        Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"
+                                        Background="#FFCC0000"
+                                        Foreground="White"
+                                        Padding="5,2"
+                                        Margin="0"
+                                        Visibility="{Binding IsHovered, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+                
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <EventSetter Event="MouseEnter" Handler="DataGridRow_MouseEnter"/>
+                        <EventSetter Event="MouseLeave" Handler="DataGridRow_MouseLeave"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                    </Style>
+                </DataGrid.RowStyle>
+            </DataGrid>
+        </GroupBox>
     </Grid>
 </Window>
